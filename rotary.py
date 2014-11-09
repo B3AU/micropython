@@ -19,9 +19,13 @@ class rotary():
         self.Aint = pyb.ExtInt(self.A,pyb.ExtInt.IRQ_RISING_FALLING,pyb.Pin.PULL_UP,self.callback)
 
 
+        self.init = True
+
     def callback(self,line):
-        #     self.Bint.disable()
-        #     self.Aint.disable()
+        if self.init:
+            self.Bint.disable()
+            self.Aint.disable()
+
 
         A = self.A.value()
         B = self.B.value()
@@ -68,16 +72,15 @@ class rotary():
                 self.prevA = A
                 self.prevB = B
 
-        #     self.Bint.enable()
-        #     self.Aint.enable()
+        if self.init:
+            self.Bint.enable()
+            self.Aint.enable()
 
         if A==1 and B==1:
             if self.CWcount>=3 and self.CWcount>self.CCWcount:
-                self.position+=1
-                print (self.position)
-            if self.CCWcount>=3 and self.CCWcount>self.CWcount:
                 self.position-=1
-                print(self.position)
+            if self.CCWcount>=3 and self.CCWcount>self.CWcount:
+                self.position+=1
             self.CCWcount = 0
             self.CWcount  = 0
 

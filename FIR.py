@@ -5,7 +5,8 @@ class FIR():
     """
         Finit impulse response filter, aka moving average.
     """
-    def __init__(self, window_size=30):
+    def __init__(self, window_size=30,div=1):
+        self.div = div
         self.win_size = window_size
         self.a = array.array('l', window_size * [0])  # no double on pyboard? integers logic for now
         self.arr_position = 0
@@ -20,4 +21,4 @@ class FIR():
         self.sum += value
 
     def get_value(self):
-        return self.sum / self.win_size
+        return self.sum / self.win_size / self.div
