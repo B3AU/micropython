@@ -22,3 +22,6 @@ class FIR():
 
     def get_value(self):
         return self.sum / self.win_size / self.div
+
+    def median(self):
+        return sorted(self.a)[int(self.win_size/2)]

@@ -31,6 +31,13 @@ class MAX31865():
 
         self.RefR = 100.0325 #RefR/2
 
+        self.last_read_time = 0
+        self.last_read_temp = 0
+        self.last_FIR = 0
+
+
+        self.conversion_time = 22 #21ms for 50Hz, 17.6 for 60Hz
+
 
     def _RawToTemp(self,raw):
         R0 = raw/(1<<15)*200
@@ -43,6 +50,14 @@ class MAX31865():
         return (A - math.sqrt(A*A - 4*B*(1-100/R0) ) ) / (2*B),R0
 
     def read(self):
+        if pyb.millis()-self.last_read_time > self.conversion_time:
+            temp,avg_temp = self._read()
+            self.last_read_temp = temp
+            self.last_FIR = avg_temp
+        return self.last_read_temp,self.last_FIR
+
+
+    def _read(self):
 
         #read config
         #config = self.spi.read(0x00,1)[0]
@@ -61,7 +76,7 @@ class MAX31865():
 
         self.fir.push(raw)
         temp,R0 = self._RawToTemp(raw)
-        avg_temp,avg_R0 = self._RawToTemp(self.fir.get_value())
+        avg_temp,avg_R0 = self._RawToTemp(self.fir.median())
 
-        return temp,R0,raw,avg_temp,avg_R0
+        return temp,avg_temp
 
